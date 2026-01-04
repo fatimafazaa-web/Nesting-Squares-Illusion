@@ -60,9 +60,10 @@ trials.forEach(trial => {
 });
 
 // إعداد jsPsych وتشغيل التجربة
-jsPsych.init({
-    timeline: timeline,
-    on_finish: function() {
-        jsPsych.data.displayData(); // عرض النتائج في نهاية التجربة
-    },
+const jsPsych = initJsPsych({
+    on_finish: function () {
+        jsPsych.data.displayData();
+    }
 });
+
+jsPsych.run(timeline);
