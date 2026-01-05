@@ -156,24 +156,25 @@
       if (label.querySelector('.yesno')) return;
       const span = document.createElement('span');
       span.className = 'yesno';
+      // تأكدي أن الأزرار من نوع button لتفادي سلوك الافتراضي لنماذج
       span.innerHTML = '<button class="yes" type="button">نعم</button><button class="no" type="button">لا</button>';
       label.appendChild(span);
     });
 
+    // معالج النقر يوقف انتقال الحدث حتى لا يتفاعل مع الـ label
     document.addEventListener('click', (e) => {
-      if (e.target.matches('.yesno .yes')) {
+      // زر نعم أو لا
+      if (e.target.matches('.yesno .yes') || e.target.matches('.yesno .no')) {
+        e.preventDefault();
+        e.stopPropagation(); // هذا يمنع تفعيل سلوك الـ label
+        const isYes = e.target.classList.contains('yes');
         const label = e.target.closest('label');
         const cb = label && label.querySelector('input[type="checkbox"]');
         if (!cb) return;
-        cb.checked = true; cb.indeterminate = false;
-        setChildrenChecked(cb, true); updateParents(cb);
-      }
-      if (e.target.matches('.yesno .no')) {
-        const label = e.target.closest('label');
-        const cb = label && label.querySelector('input[type="checkbox"]');
-        if (!cb) return;
-        cb.checked = false; cb.indeterminate = false;
-        setChildrenChecked(cb, false); updateParents(cb);
+        cb.checked = isYes;
+        cb.indeterminate = false;
+        setChildrenChecked(cb, isYes);
+        updateParents(cb);
       }
     });
 
@@ -204,23 +205,18 @@
     // افتراضيًا هناك صورة raw في الحاوية (إذا أردت iframe افتراضي غيّر previewContainer في الـ HTML)
     // حدث تحميل الصورة الافتراضية لعرض المعلومات
     function setInfoForImgElement(imgEl, originFile) {
-      // originFile: إن وُجد يأتي من رفع المستخدم (File object)
       imageName.textContent = originFile && originFile.name ? originFile.name : (imgEl.src ? imgEl.src.split('/').pop() : 'صورة');
       imageInfo.textContent = 'جاري الحصول على المعلومات...';
-      // الأبعاد بعد تحميل العنصر <img>
       if (imgEl.complete && imgEl.naturalWidth) {
         updateInfoWithDimensions(imgEl, originFile);
       } else {
         imgEl.addEventListener('load', () => updateInfoWithDimensions(imgEl, originFile), { once: true });
         imgEl.addEventListener('error', () => { imageInfo.textContent = 'فشل تحميل الصورة'; }, { once: true });
       }
-      // إذا كان لدينا ملف محلي (originFile) نظهر الحجم من File API
       if (originFile && originFile.size) {
         const kb = Math.round(originFile.size / 1024);
-        // سيتم دمج الحجم مع الأبعاد داخل updateInfoWithDimensions
         imageInfo.dataset.size = kb + 'KB';
       } else {
-        // نحاول جلب حجم من الخادم عبر HEAD (قد يعمل مع raw.githubusercontent)
         if (imgEl.src && imgEl.src.startsWith('https://raw.githubusercontent.com')) {
           fetch(imgEl.src, { method: 'HEAD' }).then(resp => {
             const len = resp.headers.get('content-length');
