@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>تجربة المربعات المتداخلة – قياس زمن الاستجابة</title>
+  <style>
+    body { font-family: system-ui, Arial; padding: 20px; direction: rtl; }
+    h2 { margin-bottom: 10px; }
+    button { cursor:pointer; padding:10px 14px; border-radius:8px; border:0; background:#e5e7eb; font-size:16px; }
+    button:hover { background:#d1d5db; }
+
+    .image-panel { max-width:360px; margin-bottom:20px; }
+    .image-panel img { max-width:100%; border-radius:6px; border:1px solid #ddd; }
+
+    #questionsBox {
+      display:none;
+      margin-top:20px;
+      padding:20px;
+      background:#eef2ff;
+      border-radius:10px;
+      text-align:center;
+      font-size:22px;
+    }
+
+    .answers {
+      margin-top:15px;
+      font-size:20px;
+    }
+
+    .answers label {
+      margin: 0 20px;
+      cursor: pointer;
+    }
+
+    .result {
+      text-align:right;
+      font-size:18px;
+      margin-top:10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>تجربة الخداع البصري – المربعات المتداخلة</h2>
+
+<div class="image-panel">
+  <p>الصورة المستخدمة في التجربة:</p>
+  <img src="https://raw.githubusercontent.com/fatimafazaa-web/Nesting-Squares-Illusion/81bf479df6a27b18ee1d1eb980e92ff13deab1c4/20260105_043927_%D9%A0%D9%A0%D9%A0%D9%A0.png"
+       alt="خداع بصري للمربعات المتداخلة">
+  <p>
+    <a href="https://raw.githubusercontent.com/fatimafazaa-web/Nesting-Squares-Illusion/81bf479df6a27b18ee1d1eb980e92ff13deab1c4/20260105_043927_%D9%A0%D9%A0%D9%A0%D9%A0.png"
+       target="_blank">تحميل الصورة الخام</a>
+  </p>
+</div>
+
+<button id="startBtn">الانتقال إلى الأسئلة</button>
+
+<div id="questionsBox">
+  <p id="questionText"></p>
+
+  <div class="answers">
+    <label>
+      <input type="radio" name="answer" value="نعم" onclick="saveAnswer(this.value)">
+      نعم
+    </label>
+
+    <label>
+      <input type="radio" name="answer" value="لا" onclick="saveAnswer(this.value)">
+      لا
+    </label>
+  </div>
+</div>
+
+<script>
+/* ===== الأسئلة ===== */
+const questions = [
+  "هل لاحظت خداعًا بصريًا؟",
+  "هل المربعات متشابهة بالحجم؟"
+];
+
+/* ===== متغيرات التجربة ===== */
+let currentQuestion = 0;
+let startTime = 0;
+let results = [];
+
+/* ===== بدء التجربة ===== */
+document.getElementById("startBtn").addEventListener("click", startExperiment);
+
+function startExperiment() {
+  currentQuestion = 0;
+  results = [];
+  document.getElementById("questionsBox").style.display = "block";
+  showCurrentQuestion();
+}
+
+/* ===== عرض السؤال ===== */
+function showCurrentQuestion() {
+  document.getElementById("questionText").textContent = questions[currentQuestion];
+  document.querySelectorAll('input[name="answer"]').forEach(r => r.checked = false);
+  startTime = performance.now();
+}
+
+/* ===== حفظ الإجابة ===== */
+function saveAnswer(answer) {
+  const reactionTime = Math.round(performance.now() - startTime);
+
+  results.push({
+    question: questions[currentQuestion],
+    answer: answer,
+    rt_ms: reactionTime
+  });
+
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+    showCurrentQuestion();
+  } else {
+    showResults();
+  }
+}
+
+/* ===== عرض النتائج ===== */
+function showResults() {
+  let output = "<h3>النتائج وزمن الاستجابة</h3>";
+
+  results.forEach((r, i) => {
+    output += `
+      <div class="result">
+        <strong>سؤال ${i + 1}:</strong> ${r.question}<br>
+        <strong>الإجابة:</strong> ${r.answer}<br>
+        <strong>زمن الاستجابة:</strong> ${r.rt_ms} مللي ثانية
+      </div>
+      <hr>
+    `;
+  });
+
+  document.getElementById("questionsBox").innerHTML = output;
+}
+</script>
+
+</body>
+</html>
