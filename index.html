@@ -306,7 +306,75 @@
     });
 
     // ملاحظة: بعض تصميمات Canva تمنع التضمين داخل iframe (X-Frame-Options).
-    // إن لم يظهر iframe بعد الضغط على "عرض تصميم Canva"، استخدمي زر "اختيار صورة" بعد تنزيل التصميم كصورة.
+// إن لم يظهر iframe بعد الضغط على "عرض تصميم Canva"، استخدمي زر "اختيار صورة" بعد تنزيل التصميم كصورة.
+ const questions = [
+  "هل لاحظت خداعًا بصريًا؟",
+  "هل جميع المربعات متساوية بالحجم؟"
+];
+
+let currentQuestion = 0;
+let startTime = 0;
+let responses = [];
+
+function showQuestions() {
+  currentQuestion = 0;
+  responses = [];
+  document.getElementById("questionsBox").style.display = "block";
+  showCurrentQuestion();
+}
+
+function showCurrentQuestion() {
+  document.getElementById("questionText").textContent =
+    questions[currentQuestion];
+  startTime = performance.now();
+}
+
+function saveAnswer(answer) {
+  const rt = Math.round(performance.now() - startTime);
+
+  responses.push({
+    question: questions[currentQuestion],
+    answer: answer,
+    rt: rt
+  });
+
+  console.log(responses[responses.length - 1]);
+
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+    showCurrentQuestion();
+  } else {
+    document.getElementById("questionsBox").innerHTML =
+      "<p>شكرًا لمشاركتك 🌸</p>";
+
+    // جاهز للربط مع PsychoJS لاحقًا
+    /*
+    responses.forEach((r, i) => {
+      psychoJS.experiment.addData('Q' + (i+1), r.answer);
+      psychoJS.experiment.addData('Q' + (i+1) + '_RT', r.rt);
+    });
+    */
+  }
+}
   </script>
+
+  <!-- أسئلة التجربة -->
+<div id="questionsBox" style="
+  display:none;
+  margin-top:30px;
+  padding:20px;
+  background:#eef2ff;
+  border-radius:10px;
+  text-align:center;
+  font-size:22px;
+">
+
+  <p id="questionText"></p>
+
+  <button onclick="saveAnswer('yes')" style="margin:10px;font-size:20px;">نعم</button>
+  <button onclick="saveAnswer('no')"  style="margin:10px;font-size:20px;">لا</button>
+
+</div>
 </body>
 </html>
