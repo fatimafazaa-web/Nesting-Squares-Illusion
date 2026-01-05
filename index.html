@@ -357,6 +357,64 @@ function saveAnswer(answer) {
     */
   }
 }
+// ===== تعريف الأسئلة =====
+const questions = [
+  "هل لاحظت خداعًا بصريًا؟",
+  "هل جميع المربعات متساوية بالحجم؟"
+];
+
+let currentQuestion = 0;
+let startTime = 0;
+let results = [];
+
+// ===== دالة عرض الأسئلة =====
+function showQuestions() {
+  currentQuestion = 0;
+  results = [];
+  document.getElementById("questionsBox").style.display = "block";
+  showCurrentQuestion();
+}
+
+// ===== عرض السؤال الحالي وبدء قياس الزمن =====
+function showCurrentQuestion() {
+  document.getElementById("questionText").textContent =
+    questions[currentQuestion];
+  startTime = performance.now(); // ⏱️ بدء قياس زمن الاستجابة
+}
+
+// ===== حفظ الإجابة وقياس زمن الاستجابة =====
+function saveAnswer(answer) {
+  const rt = Math.round(performance.now() - startTime); // ⏱️ حساب زمن الاستجابة
+  results.push({
+    question: questions[currentQuestion],
+    answer: answer,
+    reactionTime_ms: rt
+  });
+
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+    showCurrentQuestion();
+  } else {
+    finishExperiment();
+  }
+}
+
+// ===== إظهار النتيجة النهائية =====
+function finishExperiment() {
+  console.log("النتيجة النهائية:", results);
+
+  document.getElementById("questionsBox").innerHTML =
+    "<p>تم تسجيل الإجابات، شكرًا لمشاركتك 🌸</p>";
+
+  /*
+  🔬 جاهز للبحث العلمي (PsychoJS):
+  results.forEach((r, i) => {
+    psychoJS.experiment.addData('Q' + (i+1), r.answer);
+    psychoJS.experiment.addData('Q' + (i+1) + '_RT', r.reactionTime_ms);
+  });
+  */
+}
   </script>
 <button onclick="showQuestions()">الانتقال إلى الأسئلة</button>
   <!-- أسئلة التجربة -->
