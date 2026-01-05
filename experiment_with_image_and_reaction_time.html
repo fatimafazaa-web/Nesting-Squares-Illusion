@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>تجربة المربعات المتداخلة مع قياس زمن الاستجابة</title>
+  <style>
+    body { font-family: system-ui, Arial; padding: 20px; direction: rtl; }
+    h2 { margin-bottom: 10px; }
+    button { cursor:pointer; padding:8px 12px; border-radius:6px; border:0; background:#e5e7eb; font-size:16px; }
+    button:hover { background:#d1d5db; }
+    .image-panel { max-width:360px; margin-top:20px; }
+    .image-panel img { max-width:100%; border-radius:6px; border:1px solid #ddd; }
+    #questionsBox {
+      display:none;
+      margin-top:30px;
+      padding:20px;
+      background:#eef2ff;
+      border-radius:10px;
+      text-align:center;
+      font-size:22px;
+    }
+    .answers button { margin:10px; font-size:20px; }
+    .result { text-align:right; font-size:18px; margin-top:10px; }
+  </style>
+</head>
+
+<body>
+
+<h2>تجربة الخداع البصري – المربعات المتداخلة</h2>
+
+<div class="image-panel">
+  <p>الصورة المستخدمة في التجربة:</p>
+  <img src="https://raw.githubusercontent.com/fatimafazaa-web/Nesting-Squares-Illusion/81bf479df6a27b18ee1d1eb980e92ff13deab1c4/20260105_043927_%D9%A0%D9%A0%D9%A0%D9%A0.png"
+       alt="خداع بصري للمربعات المتداخلة">
+  <p>
+    <a href="https://raw.githubusercontent.com/fatimafazaa-web/Nesting-Squares-Illusion/81bf479df6a27b18ee1d1eb980e92ff13deab1c4/20260105_043927_%D9%A0%D9%A0%D9%A0%D9%A0.png"
+       target="_blank">تحميل الصورة الخام</a>
+  </p>
+</div>
+
+<button onclick="startExperiment()">الانتقال إلى الأسئلة</button>
+
+<div id="questionsBox">
+  <p id="questionText"></p>
+
+  <div class="answers">
+    <button onclick="saveAnswer('نعم')">نعم</button>
+    <button onclick="saveAnswer('لا')">لا</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  "هل لاحظت خداعًا بصريًا؟",
+  "هل جميع المربعات متساوية بالحجم؟"
+];
+
+let currentQuestion = 0;
+let startTime = 0;
+let results = [];
+
+function startExperiment() {
+  currentQuestion = 0;
+  results = [];
+  document.getElementById("questionsBox").style.display = "block";
+  showCurrentQuestion();
+}
+
+function showCurrentQuestion() {
+  document.getElementById("questionText").textContent =
+    questions[currentQuestion];
+  startTime = performance.now();
+}
+
+function saveAnswer(answer) {
+  const rt = Math.round(performance.now() - startTime);
+
+  results.push({
+    question: questions[currentQuestion],
+    answer: answer,
+    reactionTime_ms: rt
+  });
+
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+    showCurrentQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  let html = "<h3>النتائج</h3>";
+
+  results.forEach((r, i) => {
+    html += `
+      <div class="result">
+        <strong>سؤال ${i + 1}:</strong> ${r.question}<br>
+        <strong>الإجابة:</strong> ${r.answer}<br>
+        <strong>زمن الاستجابة:</strong> ${r.reactionTime_ms} ms
+      </div>
+      <hr>
+    `;
+  });
+
+  document.getElementById("questionsBox").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
